@@ -12,7 +12,7 @@ from threading import Thread
 # ------------------------------------------------------------------------------------------------------------------------
 # 🔌💻 Local Model
 # ------------------------------------------------------------------------------------------------------------------------
-class GetONNXGLMHandle(LocalLLMHandle):
+class GetLlamaHandle(LocalLLMHandle):
 
     def load_model_info(self):
         # 🏃‍♂️🏃‍♂️🏃‍♂️ 子进程执行
@@ -48,7 +48,7 @@ class GetONNXGLMHandle(LocalLLMHandle):
             history = kwargs['history']
             console_slience = kwargs.get('console_slience', True)
             return query, max_length, top_p, temperature, history, console_slience
-        
+
         def convert_messages_to_prompt(query, history):
             prompt = ""
             for a, b in history:
@@ -56,7 +56,7 @@ class GetONNXGLMHandle(LocalLLMHandle):
                 prompt += "\n{b}" + b
             prompt += f"\n[INST]{query}[/INST]"
             return prompt
-        
+
         query, max_length, top_p, temperature, history, console_slience = adaptor(kwargs)
         prompt = convert_messages_to_prompt(query, history)
         # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-
@@ -70,13 +70,13 @@ class GetONNXGLMHandle(LocalLLMHandle):
         thread = Thread(target=self._model.generate, kwargs=generation_kwargs)
         thread.start()
         generated_text = ""
-        for new_text in streamer: 
+        for new_text in streamer:
             generated_text += new_text
             if not console_slience: print(new_text, end='')
             yield generated_text.lstrip(prompt_tk_back).rstrip("</s>")
         if not console_slience: print()
         # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-
-        
+
     def try_to_import_special_deps(self, **kwargs):
         # import something that will raise error if the user does not install requirement_*.txt
         # 🏃‍♂️🏃‍♂️🏃‍♂️ 主进程执行
@@ -87,4 +87,4 @@ class GetONNXGLMHandle(LocalLLMHandle):
 # ------------------------------------------------------------------------------------------------------------------------
 # 🔌💻 GPT-Academic Interface
 # ------------------------------------------------------------------------------------------------------------------------
-predict_no_ui_long_connection, predict = get_local_llm_predict_fns(GetONNXGLMHandle, model_name)
+predict_no_ui_long_connection, predict = get_local_llm_predict_fns(GetLlamaHandle, model_name)
